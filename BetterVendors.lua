@@ -338,7 +338,9 @@ local function OnCellClick(self, button)
 	elseif IsShiftKeyDown() then
 		OpenBuyDialog(e)
 	else
-		BuyMerchantItem(e.index, 1)
+		-- The count is in items: one purchase is the vendor's whole bundle
+		-- (200 for a "200" icon), not a single item.
+		BuyMerchantItem(e.index, math.max(1, e.quantity or 1))
 	end
 end
 

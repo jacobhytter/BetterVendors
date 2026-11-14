@@ -2,7 +2,8 @@
 
 ## 1.0.9
 
-- Fixed the quantity dialog for items a vendor sells in bundles (for example ammo in stacks of 200). The number you enter now counts purchases, and the dialog shows how many items you will receive, so entering 1 no longer looks like 1 item while you get 200.
+- Right-click now buys one full vendor bundle: an item sold as "200" on the icon gives you 200, not 1.
+- The quantity dialog now handles items a vendor sells in bundles (for example ammo in stacks of 200): the number you enter counts purchases, and the dialog shows how many items you will receive.
 - Limited vendor stock is now counted in purchases, and large orders are split into whole bundles.
 
 ## 1.0.8
