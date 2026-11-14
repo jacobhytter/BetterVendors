@@ -655,7 +655,7 @@ local function Build(UI, ctx)
 	toolbar:SetHeight(TOOLBAR_H - 8)
 
 	searchBox = UI:CreateEditBox(toolbar, {
-		width = 190,
+		width = 170,
 		height = 28,
 		maxLetters = 60,
 		onChanged = function(text)
@@ -689,7 +689,8 @@ local function Build(UI, ctx)
 
 	local usableToggle = ctx:CreateToggle(toolbar, {
 		label = "Only usable",
-		width = 170,
+		width = 210,
+		trackWidth = 68,
 		checked = db.onlyUsable == true,
 		onChanged = function(checked)
 			db.onlyUsable = checked
@@ -699,7 +700,8 @@ local function Build(UI, ctx)
 	})
 	local knownToggle = ctx:CreateToggle(toolbar, {
 		label = "Hide known",
-		width = 170,
+		width = 210,
+		trackWidth = 68,
 		checked = db.hideKnown == true,
 		onChanged = function(checked)
 			db.hideKnown = checked

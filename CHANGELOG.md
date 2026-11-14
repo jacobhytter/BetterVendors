@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Widened the "Only usable" and "Hide known" toggles so their labels are no longer cut off.
+
 ## 1.0.1
 
 - Slot filter is now a compact multi-column picker that stays inside the window, instead of a long dropdown list.
