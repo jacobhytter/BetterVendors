@@ -17,8 +17,8 @@ Replaces the default vendor window with a centered, searchable item grid that ma
 
 | Action | Result |
 |---|---|
-| Click an item | Buy one |
-| Shift+click an item | Open the quantity dialog (**Stack** and **Max** shortcuts) |
+| Right-click an item | Buy one (like the default vendor window) |
+| Shift+right-click an item | Open the quantity dialog (**Stack** and **Max** shortcuts) |
 | Mouse wheel | Previous / next page |
 | ESC or the X button | Close the vendor |
 
@@ -29,7 +29,7 @@ SharedForeverUI2 must be installed. It supplies the window, tab and button styli
 ## Notes
 
 - The default vendor window is hidden while BetterVendors is enabled. Disable the addon to get it back.
-- Currency and item costs are bought without Blizzard's extra confirmation popup, so the quantity dialog (Shift+click) is the safer way to make large purchases.
+- Currency and item costs are bought without Blizzard's extra confirmation popup, so the quantity dialog (Shift+right-click) is the safer way to make large purchases.
 
 ## License
 

@@ -330,7 +330,7 @@ local OpenBuyDialog
 
 local function OnCellClick(self, button)
 	local e = self.entry
-	if not e or button ~= "LeftButton" then
+	if not e or button ~= "RightButton" then
 		return
 	end
 	if e.buyback then
@@ -373,7 +373,7 @@ local function CreateCell(parent, i)
 	local b = CreateFrame("Button", nil, parent)
 	b:SetSize(CELL_W, CELL_H)
 	b:SetPoint("TOPLEFT", parent, "TOPLEFT", col * (CELL_W + GAP), -row * (CELL_H + GAP))
-	b:RegisterForClicks("LeftButtonUp")
+	b:RegisterForClicks("RightButtonUp")
 
 	b.bg = b:CreateTexture(nil, "BACKGROUND")
 	b.bg:SetAllPoints()

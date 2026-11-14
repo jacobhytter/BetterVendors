@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.8
+
+- Buying now follows the default vendor window: right-click buys one item, Shift+right-click opens the quantity dialog. Right-click on the Buy Back tab buys the item back.
+
 ## 1.0.7
 
 - Packaging and repository housekeeping only; no changes to how the addon works.
