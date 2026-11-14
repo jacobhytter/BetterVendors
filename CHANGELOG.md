@@ -2,6 +2,7 @@
 
 ## 1.0.9
 
+- Hovering an item shows the default vendor cursor: the coloured bag when you can buy it, the greyed-out bag when you can't (too expensive, out of stock or not for sale).
 - Right-click now buys one full vendor bundle: an item sold as "200" on the icon gives you 200, not 1.
 - The quantity dialog now handles items a vendor sells in bundles (for example ammo in stacks of 200): the number you enter counts purchases, and the dialog shows how many items you will receive.
 - Limited vendor stock is now counted in purchases, and large orders are split into whole bundles.

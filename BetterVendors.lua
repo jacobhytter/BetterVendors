@@ -212,13 +212,13 @@ local function BuildEntries()
 		end
 	else
 		for i = 1, GetMerchantNumItems() do
-			local name, texture, price, quantity, avail, _, isUsable = MerchantInfo(i)
+			local name, texture, price, quantity, avail, isPurchasable, isUsable = MerchantInfo(i)
 			if name and (isUsable or not onlyUsable) and MatchesSearch(name)
 				and not (hideKnown and Scan(i).known)
 				and (state.slot == "all" or Scan(i).slot == state.slot) then
 				list[#list + 1] = {
 					index = i, name = name, texture = texture, avail = avail,
-					costs = ReadCosts(i), usable = isUsable,
+					costs = ReadCosts(i), usable = isUsable, purchasable = isPurchasable,
 					price = price, quantity = quantity, link = GetMerchantItemLink(i),
 				}
 			end
@@ -265,6 +265,27 @@ local function UpdateCell(cell, e)
 	cell:Show()
 end
 
+-- Default vendor cursor: a coloured bag when the item can be bought, a greyed
+-- out one when it can't (not affordable, out of stock, not purchasable).
+local hoveredCell
+
+local function ApplyCursor(cell)
+	local e = cell.entry
+	if not e then
+		return
+	end
+	local buyable = e.purchasable ~= false and e.avail ~= 0 and CanAfford(e, 1)
+	hoveredCell = cell
+	SetCursor(buyable and "BUY_CURSOR" or "BUY_ERROR_CURSOR")
+end
+
+local function ClearCursor()
+	if hoveredCell then
+		hoveredCell = nil
+		ResetCursor()
+	end
+end
+
 local function DoRefresh()
 	if not window or not window:IsShown() then
 		return
@@ -277,6 +298,17 @@ local function DoRefresh()
 	local first = (state.page - 1) * PER_PAGE
 	for i, cell in ipairs(cells) do
 		UpdateCell(cell, entries[first + i])
+	end
+
+	-- Keep the cursor in step with the item under it (page flips, purchases).
+	if hoveredCell and not (hoveredCell:IsShown() and hoveredCell:IsMouseOver()) then
+		ClearCursor()
+	end
+	for _, cell in ipairs(cells) do
+		if cell:IsShown() and cell:IsMouseOver() then
+			ApplyCursor(cell)
+			break
+		end
 	end
 
 	pageText:SetText(string.format("Page %d / %d", state.page, pages))
@@ -350,6 +382,7 @@ local function OnCellEnter(self)
 	if not e then
 		return
 	end
+	ApplyCursor(self)
 	GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
 	if e.buyback then
 		GameTooltip:SetBuybackItem(e.index)
@@ -419,6 +452,7 @@ local function CreateCell(parent, i)
 	b:SetScript("OnEnter", OnCellEnter)
 	b:SetScript("OnLeave", function(self)
 		Paint(self.bg, ROW)
+		ClearCursor()
 		GameTooltip:Hide()
 	end)
 	b:Hide()
@@ -811,6 +845,7 @@ local function Build(UI, ctx)
 
 	-- Closing our window (X or ESC) must also end the vendor session.
 	window:HookScript("OnHide", function()
+		ClearCursor()
 		buyDialog:Hide()
 		if state.merchantOpen then
 			state.merchantOpen = false
