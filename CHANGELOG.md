@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.5
+
+- New addon icon: a detailed pixel-art treasure chest.
+
 ## 1.0.4
 
 - Other panels (Character, Bags, ...) no longer open offset to the right when the vendor window is open; the hidden default vendor frame no longer reserves screen space.
