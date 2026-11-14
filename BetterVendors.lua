@@ -809,6 +809,13 @@ local function HideDefaultMerchant()
 		self:EnableMouse(false)
 	end
 	Conceal(MerchantFrame)
+	-- Blizzard's panel manager keeps room for the default vendor frame and pushes
+	-- other panels (Character, Bags...) aside. Our window is not a panel, so make
+	-- the hidden frame reserve no space.
+	MerchantFrame:SetAttribute("UIPanelLayout-width", 0)
+	if UIPanelWindows and UIPanelWindows.MerchantFrame then
+		UIPanelWindows.MerchantFrame.width = 0
+	end
 	-- Other code (fades, skins) may restore the alpha, so pin it at 0.
 	hooksecurefunc(MerchantFrame, "SetAlpha", function(self, alpha)
 		if alpha ~= 0 then
