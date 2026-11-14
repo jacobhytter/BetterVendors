@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7
+
+- Packaging and repository housekeeping only; no changes to how the addon works.
+
 ## 1.0.6
 
 - Items your character can't use now show a red "Can't use" note and a red-tinted icon.
