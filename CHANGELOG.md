@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Added an original addon icon, shown in the in-game addon list.
+
 ## 1.0.2
 
 - Widened the "Only usable" and "Hide known" toggles so their labels are no longer cut off.
