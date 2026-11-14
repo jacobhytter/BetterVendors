@@ -13,12 +13,13 @@ local FRAME_H = 80 + TAB_H + PANEL_H + 50
 -- Same bronze palette as SharedForeverUI2 tables and tabs.
 local ROW = { 0.12, 0.077, 0.043, 0.68 }
 local HOVER = { 0.31, 0.21, 0.105, 0.96 }
+local HEADER = { 0.25, 0.16, 0.075, 0.94 }
 local BRONZE = { 0.39, 0.27, 0.14, 0.65 }
 local GOLD = { 0.73, 0.49, 0.21, 0.85 }
 local TEXT = { 0.86, 0.72, 0.49 }
 
 local state = { tab = "all", page = 1, merchantOpen = false, search = "", slot = "all" }
-local slotDropdown
+local slotButton, slotPicker
 local db
 local searchBox, searchHint, host
 local window, tabs, cells, pageText, prevButton, nextButton, goldText, repairButton, repairText
@@ -137,11 +138,11 @@ local SLOT_OF_EQUIPLOC = {
 	INVTYPE_CLOAK = "back", INVTYPE_CHEST = "chest", INVTYPE_ROBE = "chest",
 	INVTYPE_WRIST = "wrist", INVTYPE_HAND = "hands", INVTYPE_WAIST = "waist",
 	INVTYPE_LEGS = "legs", INVTYPE_FEET = "feet", INVTYPE_FINGER = "finger",
-	INVTYPE_TRINKET = "trinket", INVTYPE_WEAPON = "onehand",
-	INVTYPE_WEAPONMAINHAND = "onehand", INVTYPE_2HWEAPON = "twohand",
+	INVTYPE_TRINKET = "trinket", INVTYPE_WEAPON = "weapon",
+	INVTYPE_WEAPONMAINHAND = "weapon", INVTYPE_2HWEAPON = "weapon",
 	INVTYPE_SHIELD = "offhand", INVTYPE_WEAPONOFFHAND = "offhand",
-	INVTYPE_HOLDABLE = "offhand", INVTYPE_RANGED = "ranged",
-	INVTYPE_RANGEDRIGHT = "ranged", INVTYPE_THROWN = "ranged",
+	INVTYPE_HOLDABLE = "offhand", INVTYPE_RANGED = "weapon",
+	INVTYPE_RANGEDRIGHT = "weapon", INVTYPE_THROWN = "weapon",
 }
 
 -- Localized slot label -> slot, for matching tooltip lines.
@@ -157,14 +158,15 @@ for slot, equipLoc in pairs({
 	back = "INVTYPE_CLOAK", chest = "INVTYPE_CHEST", wrist = "INVTYPE_WRIST",
 	hands = "INVTYPE_HAND", waist = "INVTYPE_WAIST", legs = "INVTYPE_LEGS",
 	feet = "INVTYPE_FEET", finger = "INVTYPE_FINGER", trinket = "INVTYPE_TRINKET",
-	onehand = "INVTYPE_WEAPON", twohand = "INVTYPE_2HWEAPON",
-	offhand = "INVTYPE_WEAPONOFFHAND", ranged = "INVTYPE_RANGED",
+	offhand = "INVTYPE_WEAPONOFFHAND",
 }) do
 	SLOT_LABEL[slot] = _G[equipLoc] or slot
 end
+-- One-hand, two-hand and ranged weapons share one "Weapons" entry.
+SLOT_LABEL.weapon = WEAPONS or "Weapons"
 
-local SLOT_ORDER = { "head", "neck", "shoulder", "back", "chest", "wrist", "hands", "waist",
-	"legs", "feet", "finger", "trinket", "onehand", "twohand", "offhand", "ranged" }
+local SLOT_CHOICES = { "all", "head", "neck", "shoulder", "back", "chest", "wrist", "hands",
+	"waist", "legs", "feet", "finger", "trinket", "weapon", "offhand" }
 
 local function Scan(index)
 	local cached = scanCache[index]
@@ -289,6 +291,24 @@ end
 local function ChangePage(step)
 	state.page = state.page + step
 	Refresh()
+end
+
+local function SlotLabel(slot)
+	return slot == "all" and (ALL or "All") or SLOT_LABEL[slot]
+end
+
+local function SelectSlot(slot, refresh)
+	state.slot = slot
+	if slotButton then
+		slotButton:SetText("Slot: " .. SlotLabel(slot))
+	end
+	if slotPicker then
+		slotPicker:Hide()
+	end
+	if refresh then
+		state.page = 1
+		Refresh()
+	end
 end
 
 local OpenBuyDialog
@@ -520,6 +540,63 @@ function OpenBuyDialog(entry)
 end
 
 local function Build(UI, ctx)
+	-- Compact multi-column slot chooser; the library's single-column popup is
+	-- taller than this window with this many choices.
+	local function CreateSlotPicker()
+		local COLS, BW, BH, PAD = 3, 112, 26, 8
+		local rows = math.ceil(#SLOT_CHOICES / COLS)
+
+		-- Transparent catcher: a click anywhere outside the picker closes it.
+		local cover = CreateFrame("Button", nil, host)
+		cover:SetAllPoints(host)
+		cover:SetFrameLevel(host:GetFrameLevel() + 40)
+		cover:SetScript("OnClick", function(self) self:Hide() end)
+		cover:Hide()
+
+		local panel = CreateFrame("Frame", nil, cover)
+		panel:SetSize(COLS * BW + (COLS + 1) * PAD, rows * BH + (rows + 1) * PAD)
+		panel:SetFrameLevel(cover:GetFrameLevel() + 5)
+		panel:EnableMouse(true)
+		panel:SetPoint("TOPLEFT", slotButton, "BOTTOMLEFT", 0, -4)
+		local bg = panel:CreateTexture(nil, "BACKGROUND")
+		bg:SetAllPoints()
+		bg:SetColorTexture(0.08, 0.05, 0.03, 0.98)
+		Rule(panel, "TOPLEFT", "TOPRIGHT", false, GOLD)
+		Rule(panel, "BOTTOMLEFT", "BOTTOMRIGHT", false, BRONZE)
+		Rule(panel, "TOPLEFT", "BOTTOMLEFT", true, BRONZE)
+		Rule(panel, "TOPRIGHT", "BOTTOMRIGHT", true, BRONZE)
+
+		local buttons = {}
+		local function Restyle()
+			for slot, b in pairs(buttons) do
+				local active = slot == state.slot
+				Paint(b.bg, active and HEADER or ROW)
+				if active then
+					b.label:SetTextColor(1, 0.82, 0.16)
+				else
+					b.label:SetTextColor(TEXT[1], TEXT[2], TEXT[3])
+				end
+			end
+		end
+		for i, slot in ipairs(SLOT_CHOICES) do
+			local col, row = (i - 1) % COLS, math.floor((i - 1) / COLS)
+			local b = CreateFrame("Button", nil, panel)
+			b:SetSize(BW, BH)
+			b:SetPoint("TOPLEFT", panel, "TOPLEFT", PAD + col * (BW + PAD), -(PAD + row * (BH + PAD)))
+			b.bg = b:CreateTexture(nil, "BACKGROUND")
+			b.bg:SetAllPoints()
+			b.label = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			b.label:SetPoint("CENTER")
+			b.label:SetText(SlotLabel(slot))
+			b:SetScript("OnEnter", function(self) Paint(self.bg, HOVER) end)
+			b:SetScript("OnLeave", Restyle)
+			b:SetScript("OnClick", function() SelectSlot(slot, true) end)
+			buttons[slot] = b
+		end
+		cover:SetScript("OnShow", Restyle)
+		return cover
+	end
+
 	local w, reason = ctx:CreateWindow({
 		windowId = "Vendor",
 		title = "Vendor",
@@ -601,25 +678,14 @@ local function Build(UI, ctx)
 	end)
 	searchBox:HookScript("OnEscapePressed", function(self) self:ClearFocus() end)
 
-	local slotItems = { { text = ALL or "All", value = "all" } }
-	for _, slot in ipairs(SLOT_ORDER) do
-		slotItems[#slotItems + 1] = { text = SLOT_LABEL[slot], value = slot }
-	end
-	slotDropdown = UI:CreateDropdown(toolbar, {
-		items = slotItems,
-		value = "all",
-		width = 120,
-		onChanged = function(value)
-			state.slot = value
-			state.page = 1
-			Refresh()
+	slotButton = UI:CreateActionButton(toolbar, {
+		text = "Slot: " .. SlotLabel("all"), width = 130, height = 28,
+		onClick = function()
+			slotPicker:SetShown(not slotPicker:IsShown())
 		end,
 	})
-	if slotDropdown then
-		slotDropdown:SetPoint("LEFT", searchBox, "RIGHT", 4, 0)
-	else
-		UI:Report("BetterVendors: slot dropdown unavailable")
-	end
+	slotButton:SetPoint("LEFT", searchBox, "RIGHT", 8, 0)
+	slotPicker = CreateSlotPicker()
 
 	local usableToggle = ctx:CreateToggle(toolbar, {
 		label = "Only usable",
@@ -722,10 +788,7 @@ local function DoOpenVendor()
 	state.tab = "all"
 	tabs:SetSelection("all", false)
 	state.search = ""
-	state.slot = "all"
-	if slotDropdown then
-		slotDropdown:SetSelection("all", false)
-	end
+	SelectSlot("all", false)
 	searchBox:SetText("")
 	window:Show()
 	Refresh()

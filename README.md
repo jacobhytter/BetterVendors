@@ -7,7 +7,7 @@ Replaces the default vendor window with a centered, searchable item grid that ma
 - Centered window, 4 columns of items, mouse wheel flips pages
 - Tabs: **All Items**, **Usable**, **Buy Back**
 - **Search** by item name
-- **Slot** filter. Recipes are matched by the slot of the item they craft
+- **Slot** filter (armor slots, Weapons, Off Hand). Recipes are matched by the slot of the item they craft
 - Saved toggles: **Only usable** and **Hide known** (already-known recipes, pets, toys)
 - Buy **any quantity**, beyond the stack size, with the total cost shown first
 - Works with gold, **currencies** (for example Merchant's Favor) and item costs. Your current amount of each currency the vendor asks for is shown in the footer, and costs you cannot afford are red

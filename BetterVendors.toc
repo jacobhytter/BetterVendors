@@ -2,7 +2,7 @@
 ## Title: BetterVendors
 ## Notes: Replaces the default vendor window with a centered, searchable, filterable item grid in the Forever bronze style.
 ## Author: jacobhytter
-## Version: 1.0.0
+## Version: 1.0.1
 ## Category: Interface Enhancements
 ## IconTexture: Interface\Icons\INV_Misc_Coin_01
 ## X-Website: https://github.com/jacobhytter/BetterVendors
