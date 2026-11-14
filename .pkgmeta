@@ -1,0 +1,10 @@
+package-as: BetterVendors
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
+
+ignore:
+  - README.md
+  - .gitignore
+  - .pkgmeta

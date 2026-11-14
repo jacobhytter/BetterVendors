@@ -17,8 +17,6 @@ local BRONZE = { 0.39, 0.27, 0.14, 0.65 }
 local GOLD = { 0.73, 0.49, 0.21, 0.85 }
 local TEXT = { 0.86, 0.72, 0.49 }
 
-local TAB_IDS = { "all", "usable", "buyback" }
-
 local state = { tab = "all", page = 1, merchantOpen = false, search = "", slot = "all" }
 local slotDropdown
 local db
@@ -93,7 +91,7 @@ local function CostText(entry, bundles)
 		local text = need .. " |T" .. cost.texture .. ":14|t"
 		parts[#parts + 1] = (have and have < need) and (RED .. text .. "|r") or text
 	end
-	return #parts > 0 and table.concat(parts, "  ") or FREE or "Free"
+	return #parts > 0 and table.concat(parts, "  ") or "Free"
 end
 
 local function CanAfford(entry, bundles)
@@ -711,10 +709,6 @@ local function Build(UI, ctx)
 			CloseMerchant()
 		end
 	end)
-	local name = window:GetName()
-	if name then
-		tinsert(UISpecialFrames, name)
-	end
 	return true
 end
 
@@ -741,29 +735,6 @@ local function OpenVendor()
 	local ok, err = pcall(DoOpenVendor)
 	if not ok then
 		print("|cffff5555BetterVendors error:|r " .. tostring(err))
-	end
-end
-
-local function PrintDiagnostics()
-	local function say(...) print("|cff0cd29fBetterVendors:|r", ...) end
-	say("merchant items:", GetMerchantNumItems(), "buyback:", GetNumBuybackItems())
-	say("GetMerchantItemInfo global:", GetMerchantItemInfo and "yes" or "no",
-		"C_MerchantFrame.GetItemInfo:", (C_MerchantFrame and C_MerchantFrame.GetItemInfo) and "yes" or "no")
-	say("item 1:", tostring((MerchantInfo(1))), "entries:", #BuildEntries())
-	say("window shown:", tostring(window and window:IsShown()), "state.tab:", state.tab, "onlyUsable:", tostring(db and db.onlyUsable))
-	local c = cells and cells[1]
-	if host then
-		say("host shown:", tostring(host:IsShown()), "size:", host:GetWidth(), host:GetHeight(),
-			"level:", host:GetFrameLevel(), "interior level:", window.interior:GetFrameLevel())
-	end
-	if tabs then
-		say("tabs shown:", tostring(tabs:IsShown()), "size:", tabs:GetWidth(), tabs:GetHeight(),
-			"left/top:", tostring(tabs:GetLeft()), tostring(tabs:GetTop()))
-	end
-	if c then
-		say("cell1 shown:", tostring(c:IsShown()), "visible:", tostring(c:IsVisible()),
-			"size:", c:GetWidth(), c:GetHeight(), "alpha:", c:GetEffectiveAlpha(),
-			"parent:", tostring(c:GetParent():IsShown()))
 	end
 end
 
@@ -812,17 +783,8 @@ local function Setup()
 	if not Build(UI, ctx) then
 		return
 	end
-	print("|cff0cd29fBetterVendors|r loaded. Type /bv at a vendor for diagnostics.")
 
 	HideDefaultMerchant()
-
-	SLASH_BETTERVENDORS1 = "/bv"
-	SlashCmdList.BETTERVENDORS = function()
-		local ok, err = pcall(PrintDiagnostics)
-		if not ok then
-			print("|cffff5555BetterVendors error:|r " .. tostring(err))
-		end
-	end
 
 	local ev = CreateFrame("Frame")
 	ev:RegisterEvent("MERCHANT_SHOW")
