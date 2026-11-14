@@ -432,14 +432,13 @@ local function CancelPurchase()
 	end
 end
 
-local function Bundles(entry, count)
-	return math.ceil(count / math.max(1, entry.quantity or 1))
+local function Bundle(entry)
+	return math.max(1, entry.quantity or 1)
 end
 
--- Most items affordable with the gold and every currency/item cost, also
--- limited by the vendor's stock.
+-- Most purchases (bundles) affordable with the gold and every currency/item
+-- cost, also limited by the vendor's stock (which is counted in purchases).
 local function MaxAffordable(entry)
-	local bundle = math.max(1, entry.quantity or 1)
 	local bundles = math.huge
 	local price = entry.price or 0
 	if price > 0 then
@@ -451,25 +450,29 @@ local function MaxAffordable(entry)
 			bundles = math.min(bundles, math.floor(have / cost.value))
 		end
 	end
-	local most = bundles == math.huge and 9999 or bundles * bundle
 	if entry.avail and entry.avail >= 0 then
-		most = math.min(most, entry.avail)
+		bundles = math.min(bundles, entry.avail)
 	end
-	return math.max(1, math.min(most, 9999))
+	if bundles == math.huge then
+		bundles = 9999
+	end
+	return math.max(1, math.min(bundles, 9999))
 end
 
--- BuyMerchantItem is capped at one stack per call, so large orders are
--- split into stack-sized purchases spaced out to avoid server throttling.
-local function StartPurchase(entry, count)
+-- BuyMerchantItem takes an item count (whole bundles) and is capped at one
+-- stack per call, so large orders are split into stack-sized purchases spaced
+-- out to avoid server throttling.
+local function StartPurchase(entry, bundles)
 	CancelPurchase()
-	local stack = math.max(1, GetMerchantItemMaxStack(entry.index))
-	local remaining = count
+	local bundle = Bundle(entry)
+	local chunkSize = math.max(bundle, math.floor(GetMerchantItemMaxStack(entry.index) / bundle) * bundle)
+	local remaining = bundles * bundle
 	buyTicker = C_Timer.NewTicker(0.2, function()
 		if not state.merchantOpen or GetMerchantItemLink(entry.index) ~= entry.link then
 			CancelPurchase()
 			return
 		end
-		local chunk = math.min(remaining, stack)
+		local chunk = math.min(remaining, chunkSize)
 		BuyMerchantItem(entry.index, chunk)
 		remaining = remaining - chunk
 		if remaining <= 0 then
@@ -480,7 +483,7 @@ end
 
 local function CreateBuyDialog(UI)
 	local d = CreateFrame("Frame", nil, window)
-	d:SetSize(340, 210)
+	d:SetSize(340, 236)
 	d:SetPoint("CENTER", window, "CENTER")
 	d:SetFrameStrata("DIALOG")
 	d:EnableMouse(true)
@@ -511,7 +514,9 @@ local function CreateBuyDialog(UI)
 
 	local stackButton = UI:CreateActionButton(d, { text = "Stack", width = 80, height = 28,
 		onClick = function()
-			d.input:SetValue(math.max(1, GetMerchantItemMaxStack(d.entry.index)), true)
+			local entry = d.entry
+			local perStack = math.floor(GetMerchantItemMaxStack(entry.index) / Bundle(entry))
+			d.input:SetValue(math.max(1, perStack), true)
 			d:Update()
 		end })
 	stackButton:SetPoint("TOPLEFT", d.input, "BOTTOMLEFT", 0, -8)
@@ -524,13 +529,16 @@ local function CreateBuyDialog(UI)
 
 	d.total = d:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	d.total:SetPoint("TOP", d.input, "BOTTOM", 0, -50)
+	d.receive = d:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	d.receive:SetPoint("TOP", d.total, "BOTTOM", 0, -4)
+	d.receive:SetTextColor(TEXT[1], TEXT[2], TEXT[3])
 
 	d.buy = UI:CreateActionButton(d, { text = "Buy", width = 110, height = 30,
 		onClick = function()
 			d.input.editBox:ClearFocus()
-			local count = d.input:GetValue()
-			if CanAfford(d.entry, Bundles(d.entry, count)) then
-				StartPurchase(d.entry, count)
+			local bundles = d.input:GetValue()
+			if CanAfford(d.entry, bundles) then
+				StartPurchase(d.entry, bundles)
 				d:Hide()
 			end
 		end })
@@ -539,11 +547,18 @@ local function CreateBuyDialog(UI)
 		onClick = function() d:Hide() end })
 	cancel:SetPoint("BOTTOMRIGHT", d, "BOTTOMRIGHT", -40, 16)
 
+	-- The number is a count of purchases; a purchase may hold several items
+	-- (for example 200 bullets), so the items received are shown separately.
 	function d:Update()
-		local count = self.input:GetValue()
-		local bundles = Bundles(self.entry, count)
+		local bundles = self.input:GetValue()
+		local bundle = Bundle(self.entry)
 		self.total:SetText("Total: " .. CostText(self.entry, bundles))
 		self.total:SetTextColor(1, 1, 1)
+		if bundle > 1 then
+			self.receive:SetText(string.format("You get %d items (%d per purchase)", bundles * bundle, bundle))
+		else
+			self.receive:SetText("")
+		end
 		self.buy:SetEnabled(CanAfford(self.entry, bundles))
 	end
 

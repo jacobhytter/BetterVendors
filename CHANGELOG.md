@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.9
+
+- Fixed the quantity dialog for items a vendor sells in bundles (for example ammo in stacks of 200). The number you enter now counts purchases, and the dialog shows how many items you will receive, so entering 1 no longer looks like 1 item while you get 200.
+- Limited vendor stock is now counted in purchases, and large orders are split into whole bundles.
+
 ## 1.0.8
 
 - Buying now follows the default vendor window: right-click buys one item, Shift+right-click opens the quantity dialog. Right-click on the Buy Back tab buys the item back.

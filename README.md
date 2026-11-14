@@ -9,7 +9,7 @@ Replaces the default vendor window with a centered, searchable item grid that ma
 - **Search** by item name
 - **Slot** filter (armor slots, Weapons, Off Hand). Recipes are matched by the slot of the item they craft
 - Saved toggles: **Only usable** and **Hide known** (already-known recipes, pets, toys)
-- Buy **any quantity**, beyond the stack size, with the total cost shown first
+- Buy **any quantity**, beyond the stack size, with the total cost shown first. For items sold in bundles (such as ammo in stacks of 200) the dialog counts purchases and shows how many items you get
 - Works with gold, **currencies** (for example Merchant's Favor) and item costs. Your current amount of each currency the vendor asks for is shown in the footer, and costs you cannot afford are red
 - **Repair All** with the repair cost
 
