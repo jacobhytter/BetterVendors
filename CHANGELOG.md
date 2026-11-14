@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.6
+
+- Items your character can't use now show a red "Can't use" note and a red-tinted icon.
+
 ## 1.0.5
 
 - New addon icon: a detailed pixel-art treasure chest.

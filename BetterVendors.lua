@@ -218,7 +218,7 @@ local function BuildEntries()
 				and (state.slot == "all" or Scan(i).slot == state.slot) then
 				list[#list + 1] = {
 					index = i, name = name, texture = texture, avail = avail,
-					costs = ReadCosts(i),
+					costs = ReadCosts(i), usable = isUsable,
 					price = price, quantity = quantity, link = GetMerchantItemLink(i),
 				}
 			end
@@ -246,6 +246,21 @@ local function UpdateCell(cell, e)
 	cell.name:SetText(e.name)
 	cell.name:SetTextColor(QualityColor(e.link))
 	cell.price:SetText(CostText(e))
+	-- Items the character can't use get a red tinted icon and a red note.
+	local unusable = e.usable == false
+	cell.unusable:SetShown(unusable)
+	if unusable then
+		cell.icon:SetVertexColor(1, 0.35, 0.35)
+	else
+		cell.icon:SetVertexColor(1, 1, 1)
+	end
+	cell.price:ClearAllPoints()
+	cell.price:SetPoint("BOTTOMLEFT", cell.icon, "BOTTOMRIGHT", 8, 0)
+	if unusable then
+		cell.price:SetPoint("BOTTOMRIGHT", cell.unusable, "BOTTOMLEFT", -4, 0)
+	else
+		cell.price:SetPoint("BOTTOMRIGHT", cell, "BOTTOMRIGHT", -6, 6)
+	end
 	cell.count:SetText((e.quantity and e.quantity > 1) and e.quantity or "")
 	cell:Show()
 end
@@ -389,6 +404,14 @@ local function CreateCell(parent, i)
 
 	b.price = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	b.price:SetPoint("BOTTOMLEFT", b.icon, "BOTTOMRIGHT", 8, 0)
+	b.price:SetJustifyH("LEFT")
+	b.price:SetWordWrap(false)
+
+	b.unusable = b:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	b.unusable:SetPoint("BOTTOMRIGHT", b, "BOTTOMRIGHT", -6, 6)
+	b.unusable:SetTextColor(1, 0.31, 0.31)
+	b.unusable:SetText("Can't use")
+	b.unusable:Hide()
 
 	b:SetScript("OnClick", OnCellClick)
 	b:SetScript("OnEnter", OnCellEnter)
