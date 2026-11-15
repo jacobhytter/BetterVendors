@@ -19,6 +19,8 @@ Replaces the default vendor window with a centered, searchable item grid that ma
 |---|---|
 | Right-click an item | Buy one (like the default vendor window) |
 | Shift+right-click an item | Open the quantity dialog (**Stack** and **Max** shortcuts) |
+| Shift+left-click an item | Link the item in the chat box you have open |
+| Ctrl+left-click an item | Preview the item |
 | Mouse wheel | Previous / next page |
 | ESC or the X button | Close the vendor |
 

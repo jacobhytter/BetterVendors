@@ -362,7 +362,22 @@ local OpenBuyDialog
 
 local function OnCellClick(self, button)
 	local e = self.entry
-	if not e or button ~= "RightButton" then
+	if not e then
+		return
+	end
+	-- Left click is for modified clicks only (Shift links the item in chat,
+	-- Ctrl previews it), like the default vendor window.
+	if button == "LeftButton" then
+		if e.link then
+			if HandleModifiedItemClick then
+				HandleModifiedItemClick(e.link)
+			elseif IsShiftKeyDown() then
+				ChatEdit_InsertLink(e.link)
+			end
+		end
+		return
+	end
+	if button ~= "RightButton" then
 		return
 	end
 	if e.buyback then
@@ -408,7 +423,7 @@ local function CreateCell(parent, i)
 	local b = CreateFrame("Button", nil, parent)
 	b:SetSize(CELL_W, CELL_H)
 	b:SetPoint("TOPLEFT", parent, "TOPLEFT", col * (CELL_W + GAP), -row * (CELL_H + GAP))
-	b:RegisterForClicks("RightButtonUp")
+	b:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 	b.bg = b:CreateTexture(nil, "BACKGROUND")
 	b.bg:SetAllPoints()

@@ -2,6 +2,7 @@
 
 ## 1.0.9
 
+- Shift+left-click links the item in the chat box you have open; Ctrl+left-click previews it, like the default vendor window.
 - Hovering an item shows the default vendor cursor: the coloured bag when you can buy it, the greyed-out bag when you can't (too expensive, out of stock or not for sale).
 - Right-click now buys one full vendor bundle: an item sold as "200" on the icon gives you 200, not 1.
 - The quantity dialog now handles items a vendor sells in bundles (for example ammo in stacks of 200): the number you enter counts purchases, and the dialog shows how many items you will receive.
