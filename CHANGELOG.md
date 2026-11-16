@@ -2,17 +2,20 @@
 
 ## 1.0.10
 
-### New
-- Shift+left-click links the item in the chat box you have open, and Ctrl+left-click previews it, like the default vendor window.
+- Shift+left-click on an item links it in the chat box you have open.
+- Ctrl+left-click on an item previews it in the dressing room.
+- Both work like the default vendor window, on the Buy Back tab too.
+
+## 1.0.9
+
 - Hovering an item shows the default vendor cursor: the coloured bag when you can buy it, the greyed-out bag when you can't (too expensive, out of stock or not for sale).
-
-### Changed
-- Buying now follows the default vendor window: right-click buys, Shift+right-click opens the quantity dialog. Right-click on the Buy Back tab buys the item back. Plain left-click no longer buys.
-- The quantity dialog counts purchases and shows how many items you will receive, which matters for items sold in bundles (for example ammo in stacks of 200).
-
-### Fixed
 - Right-click now buys one full vendor bundle: an item sold as "200" on the icon gives you 200, not 1.
+- The quantity dialog now handles items a vendor sells in bundles (for example ammo in stacks of 200): the number you enter counts purchases, and the dialog shows how many items you will receive.
 - Limited vendor stock is now counted in purchases, and large orders are split into whole bundles.
+
+## 1.0.8
+
+- Buying now follows the default vendor window: right-click buys one item, Shift+right-click opens the quantity dialog. Right-click on the Buy Back tab buys the item back.
 
 ## 1.0.7
 
